@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/todo.dart';
@@ -31,22 +32,24 @@ class TodoItemTile extends StatelessWidget {
   final VoidCallback onTap;
 
   /// Called when the user long presses on this tile.
-  final VoidCallback onLongPress;
+  final void Function(LongPressEndDetails) onLongPress;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Text("${index + 1}."),
-      title: todo.title != null ? Text(todo.title!) : null,
-      subtitle: Text(todo.description),
-      trailing: todo.completed
-          ? const Icon(
-              Icons.check,
-              color: Colors.green,
-            )
-          : const Icon(Icons.chevron_right),
+    return GestureDetector(
       onTap: onTap,
-      onLongPress: onLongPress,
+      onLongPressEnd: onLongPress,
+      child: ListTile(
+        leading: Text("${index + 1}."),
+        title: todo.title != null ? Text(todo.title!) : null,
+        subtitle: Text(todo.description),
+        trailing: todo.completed
+            ? const Icon(
+                Icons.check,
+                color: Colors.green,
+              )
+            : const Icon(Icons.chevron_right),
+      ),
     );
   }
 

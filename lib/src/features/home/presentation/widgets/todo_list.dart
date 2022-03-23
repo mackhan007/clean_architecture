@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/configs/app_configs.dart';
+import '../../../../core/functions/show_delete_dialog.dart';
 import '../../domain/entities/todo.dart';
 import '../blocs/todo_bloc/todo_bloc.dart';
 import 'todo_form.dart';
@@ -33,7 +35,7 @@ class TodoList extends StatelessWidget {
           index: index,
           todo: todo,
           onTap: () => _updateTodo(context, todo),
-          onLongPress: () {},
+          onLongPress: (data) => _showTodoMenu(context, todo, data),
         );
       },
       itemCount: todos.length,
@@ -51,6 +53,47 @@ class TodoList extends StatelessWidget {
           child: TodoFormView(todo: todo),
         ),
       ),
+    );
+  }
+
+  void _showTodoMenu(
+    BuildContext context,
+    Todo todo,
+    LongPressEndDetails data,
+  ) {
+    final bloc = context.read<TodoBloc>();
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        data.globalPosition.dx,
+        data.globalPosition.dy,
+        0,
+        0,
+      ),
+      items: [
+        PopupMenuItem(
+          child: Text(localization.deleteTodo),
+          onTap: () {
+            Future.delayed(const Duration(milliseconds: 20), () async {
+              final result = await showDeleteDialog(
+                context,
+                localization.deleteTodo,
+                localization.deleteTodoDescription,
+              );
+
+              if (result) {
+                bloc.add(
+                  TodoEvent.removeTodo(todo.id),
+                );
+              }
+            });
+          },
+        ),
+        PopupMenuItem(
+          child: Text(localization.cancel),
+        ),
+      ],
     );
   }
 }
